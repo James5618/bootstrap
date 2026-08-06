@@ -238,8 +238,24 @@ makeuserjs() {
 
 ### This is how everything happens in an intuitive format and order.
 
-# This script targets Arch-based systems; hand RHEL-family systems
-# (Fedora/CentOS/Rocky/Alma) off to bootstrap-rhel.sh.
+# This script targets Arch-based systems; hand FreeBSD off to
+# bootstrap-freebsd.sh and RHEL-family systems (Fedora/CentOS/Rocky/Alma) off
+# to bootstrap-rhel.sh.
+#
+# FreeBSD is checked with uname before /etc/os-release is read at all: that
+# file is generated at boot by the os-release service, so it is not something
+# to depend on, and nothing below this point would work there anyway.
+if [ "$(uname -s)" = "FreeBSD" ]; then
+	bsdscript="$(dirname "$0")/bootstrap-freebsd.sh"
+	[ -f "$bsdscript" ] || {
+		bsdscript="/tmp/bootstrap-freebsd.sh"
+		fetch -qo "$bsdscript" "https://raw.githubusercontent.com/james5618/bootstrap/freebsd/bootstrap-freebsd.sh" ||
+			curl -Ls "https://raw.githubusercontent.com/james5618/bootstrap/freebsd/bootstrap-freebsd.sh" >"$bsdscript" ||
+			error "Could not download bootstrap-freebsd.sh."
+	}
+	exec sh "$bsdscript"
+fi
+
 [ -f /etc/os-release ] && . /etc/os-release
 case " $ID $ID_LIKE " in
 *fedora* | *rhel* | *centos*)

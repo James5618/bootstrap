@@ -1,0 +1,127 @@
+#TAG,NAME IN REPO (or git url),PURPOSE
+#This is the FreeBSD 15 package list. Names come from the ports tree and differ
+#from Arch; a few programs are not packaged at all and are noted where they are
+#skipped. A missing package fails quietly, is recorded, and the run continues.
+#AUR (A) entries are Arch-only and are skipped here. G entries are cloned and
+#built with make, from their `freebsd` branch. UNTESTED so far - expect to
+#prune this on a first real FreeBSD run.
+,xorg,"is the graphical server and its utilities. This first one may take a while as it pulls many other dependencies first on clean installs."
+,xinit,"starts the graphical server."
+,xrandr,"queries and changes the screen layout."
+,xprop,"is a tool for detecting window properties."
+,xwininfo,"allows querying information about windows."
+,xset,"utility for configuring and ajusting X server"
+,xsetroot,"sets the root cursor and window properties."
+,xf86-input-libinput,"is the input driver; it needs kern.evdev.rcpt_mask, which the script sets."
+#Which of these two a virtual machine needs depends on how it boots: scfb
+#draws on the EFI framebuffer and finds no screen at all under a legacy BIOS
+#boot, where vesa is the one that works. The script picks between them from
+#machdep.bootmethod. Under VMware it installs open-vm-tools as well, and
+#uses xf86-video-vmware when a vmwgfx DRM device is present.
+,xf86-video-scfb,"is the framebuffer video driver for a machine booted with UEFI."
+,xf86-video-vesa,"is the video driver for a machine booted with a legacy BIOS."
+,dbus,"provides the message bus that the graphical session is launched under."
+,polkit,"manages user policies."
+,libertinus,"provides the sans and serif fonts."
+,font-awesome,"provides extended glyph support."
+#The JetBrainsMono Nerd Font is installed by the script: the packaged
+#nerd-fonts port is a very large metaport, so it is tried first and then a
+#single-family download from upstream is used as the fallback.
+,dejavu,"properly displays fallback glyphs."
+,noto,"is an expansive font package."
+,noto-emoji,"is an emoji font."
+,lf,"is an extensive terminal file manager that everyone likes."
+,py311-ueberzug,"enables previews in the lf file manager. It is ueberzug rather than ueberzugpp: only the original is in the ports tree, and it is what the lf scripts call anyway."
+#bc is in the FreeBSD base system, so the dropdown calculator needs no package.
+#picom runs on xrender here, which rounds corners but cannot antialias them;
+#glx would, but it has no DRM device to paint through under VMware.
+,picom,"is the compositor for transparency, shadows, rounded corners and removing screen-tearing."
+,arandr,"allows the user to customize monitor arrangements."
+,libnotify,"allows desktop notifications."
+,dunst,"is a suckless notification system."
+,calcurse,"terminal-based organizer for interactive and command line use"
+,fusefs-exfat,"allows management of exFAT drives."
+,fusefs-ntfs,"allows read-write access to NTFS partitions; the in-kernel driver is read-only."
+,fusefs-simple-mtpfs,"enables the mounting of cell phones."
+,nsxiv,"is a minimalist image viewer."
+,xwallpaper,"sets the wallpaper."
+,ffmpeg,"can record and splice video and audio on the command line."
+,ffmpegthumbnailer,"creates thumbnail previews of video files."
+,gnome-keyring,"serves as the system keyring."
+,py311-QDarkStyle,"provides a dark Qt theme. Note the capitals - the package is py-QDarkStyle, and pkg names are case sensitive."
+,neovim,"a tidier vim with some useful features"
+,musicpd,"is a lightweight music daemon."
+,mpc,"is a terminal interface for mpd."
+,mpv,"is the patrician's choice video player."
+,ncmpcpp,"a ncurses interface for music with multiple formats and a powerful tag editor."
+,newsboat,"is a terminal RSS client."
+#LibreWolf has no FreeBSD package; the script installs Firefox and exposes it
+#as "librewolf", which is what $BROWSER and the keybindings expect. The
+#arkenfox user.js is fetched by the script.
+#The base system is OSS, and nothing here is wired to a sound server: mpd
+#writes to /dev/dsp and the volume module drives mixer(8). pipewire and
+#pulseaudio are both in the ports tree if you ever want them, and sb-volume
+#will prefer wpctl on its own if it finds a session running.
+#Two ways to reach the mixer, since OSS has no pulsemixer or pavucontrol:
+#mixer(8) in the base system behind the keybindings and the status bar, and
+#mixertui to sit and adjust levels. A graphical mixer (audio/dsbmixer) is
+#the only way to set the default device from a UI, but it pulls in Qt for a
+#job `sysctl hw.snd.default_unit=N` also does.
+,mixertui,"is a terminal audio mixer for OSS, and is what the volume module opens on click. pulsemixer is not in the ports tree, and would want a PulseAudio server anyway."
+#There is no NetworkManager here. wifimgr is a curses front end for
+#wpa_supplicant, which is what the internet module opens when it is present.
+,wifimgr,"gives the status bar's network module something to open on click."
+,wpa_supplicant,"associates with wireless networks."
+#Transmission was split into flavours in 2023: the daemon and the utilities
+#are separate packages, and transmission-remote - which is the one the bar,
+#torwrap and transadd all use - is in the utilities, not in transmission-cli
+#(which is only the deprecated standalone client).
+,transmission-daemon,"is the torrent daemon."
+,transmission-utils,"provides transmission-remote, which the status bar's torrent module reads."
+#The status bar modules each open a program when clicked, and a click on a
+#module whose program is missing looks exactly like a click that did
+#nothing: the terminal opens and closes again immediately.
+,py311-stig,"is the torrent client the torrent module opens on click."
+,bmon,"is the bandwidth monitor the network traffic module opens on click."
+,maim,"can take quick screenshots at your request."
+,abook,"is an offline addressbook usable by neomutt."
+,unclutter-xfixes,"hides an inactive mouse."
+#Three of the scripts genuinely need bash (arrays, mapfile, process
+#substitution) and reach it through env, since it is not /bin/bash here.
+,bash,"runs the few scripts that are not POSIX sh."
+,xdg-utils,"provides xdg-open, which the url and file handlers call."
+,unzip,"unzips zips."
+,lynx,"is a terminal browser also used for generating in-terminal previews of websites, emails and HTML files."
+,xcape,"gives the special escape/super mappings."
+,xclip,"allows for copying and pasting from the command line."
+,xdotool,"provides window action utilities on the command line."
+,yt-dlp,"can download any YouTube video (or playlist or channel) when given the link."
+,zathura,"is a pdf viewer with vim-like bindings."
+,zathura-pdf-mupdf,"allows mupdf pdf compatibility in zathura."
+,poppler-utils,"manipulates .pdfs and gives .pdf previews and other .pdf functions."
+,mediainfo,"shows audio and video information and is used in the file browser."
+,atool,"manages and gives information about archives."
+,fzf,"is a fuzzy finder tool used for easy selection and location of files."
+,bat,"can highlight code output and display files and is used to generate previews in the file browser."
+,zsh-fast-syntax-highlighting,"provides syntax highlighting in the shell."
+#The task spooler installs as /usr/local/bin/ts, and the base system has a
+#ts(1) of its own - a timestamp filter - which comes first in PATH, so the
+#scripts that use the spooler call it by its full path.
+,ts,"queues commands or files for download."
+,htop,"is a graphical and colorful system monitor."
+,neomutt,"is a terminal email client."
+,isync,"synchronizes mail with mbsync."
+,msmtp,"sends mail."
+,password-store,"is a password manager used for mail credentials."
+,notmuch,"indexes mail."
+,socat,"is a utility which establishes two byte streams and transfers data between them."
+,tesseract,"command-line OCR engine for advance maimpick"
+,tesseract-data,"language packs for OCR"
+,avahi-app,"discovers the SMB shares dmenumountcifs offers to mount."
+,samba419,"provides smbclient, used to list network shares. The version suffix tracks the ports tree - adjust if this release ships a different one."
+G,https://github.com/james5618/dwmblocks.git,"serves as the modular status bar."
+G,https://github.com/james5618/dmenu.git,"runs commands and provides a UI for selection."
+G,https://github.com/james5618/st.git,"is my custom build of suckless's terminal emulator."
+G,https://github.com/james5618/dwm.git,"is the window manager."
+,slock,"allows you to lock your computer, and quickly unlock with your password. Packaged here, so it is not built from suckless git (whose config.mk still points at /usr/X11R6)."
+G,https://github.com/LukeSmithxyz/mutt-wizard.git,"is a light-weight terminal-based email system."
